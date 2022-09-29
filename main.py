@@ -1,5 +1,5 @@
 import random
-
+import math
 import numpy as np
 from scipy import special
 import time
@@ -67,11 +67,18 @@ def obtener_primer_puesto_vacio(arreglo):
 
 
 def obtener_TA():
-    return 1
+    while True:
+        R = random.uniform(0, 1)
+        TA = -29 * math.log(1 - R) + 5
+        return TA
 
 
 def obtener_IA():
-    return 1
+    while True:
+        R = random.uniform(0.0390502529816, 1)
+        IA = -8.5 * math.log((-1) * math.log(R)) + 10
+        # if TA > 0.0:
+        return IA
 
 
 def obtener_primer_puesto_vacio_medico():
@@ -116,7 +123,7 @@ def llegada():
     T = TPLL
     IA = obtener_IA()
     TPLL = T + IA
-    R = random.random()
+    R = random.uniform(0, 1)
 
     if R <= 0.24:
         NSP += 1
@@ -161,15 +168,16 @@ def resultados():
     global T
 
     for i in range(0, M):
-        PPS = (SSM[i] - SLLM[i]) / NT
+        sumatoria_permamencia_medico = SSM[i] - SLLM[i]
         PECP = (SSM[i] - SLLM[i] - STAM[i]) / NT
         PTOM[i] = (STOM[i] * 100) / T
 
     for j in range(0, E):
-        PPS = (SSE[j] - SLLE[j]) / NT
+        sumatoria_permamencia_enfermero = SSE[j] - SLLE[j]
         PECE = (SSE[j] - SLLE[j] - STAE[j]) / NT
         PTOE[j] = (STOE[j] * 100) / T
 
+    PPS = (sumatoria_permamencia_enfermero + sumatoria_permamencia_medico) / NT
     print(f"Promedio de permanencia en el sistema: {PPS}")
     print(f"Promedio de espera en cola de medicos: {PECP}")
     print(f"Promedio de espera en cola de enfermeros: {PECE}")
@@ -205,7 +213,7 @@ def realizar_simulacion():
                     # Generar TA
                     TA = obtener_TA()
                     TPSM[i] = T + TA
-                    STAM[i] = STA[i] + TA
+                    STAM[i] = STAM[i] + TA
                 else:
                     ITOM[i] = T
                     TPSM[i] = HV
@@ -214,7 +222,7 @@ def realizar_simulacion():
             else:
                 llegada()
         else:
-            if TPLL > TPSE[j]:
+            if TPSE[j] < TPLL:
                 EVENTO = "Salida Enfermero"
                 T = TPSE[j]
                 NSE -= 1
@@ -222,16 +230,19 @@ def realizar_simulacion():
                 if NSP > M:
                     NSE += 1
                     NSP -= 1
-                else:
-                    if NSE < E:
-                        ITOE[j] = T
-                        TPSE[j] = HV
-                    # Generar TA
                     TA = obtener_TA()
                     TPSE[j] = T + TA
                     STAE[j] = STAE[j] + TA
+                else:
+                    if NSE >= E:
+                        TA = obtener_TA()
+                        TPSE[j] = T + TA
+                        STAE[j] = STAE[j] + TA
+                    else:
+                        ITOE[j] = T
+                        TPSE[j] = HV
 
-                SSE[i] = SSM[i] + T
+                SSE[j] = SSM[j] + T
             else:
                 llegada()
 
