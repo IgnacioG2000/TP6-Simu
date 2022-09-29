@@ -56,7 +56,7 @@ SSM = [0] * M
 STOE = [0] * E
 STOM = [0] * M
 
-TF = 2  # 48 semanas (en minutos)
+TF = 100  # 48 semanas (en minutos)
 
 
 def obtener_primer_puesto_vacio(arreglo):
@@ -95,18 +95,18 @@ def obtener_puesto_menor_tps_de_arreglo(arreglo):
 
     for i in range(0, len(arreglo)):
         if arreglo[i] < minTPSLista:
-            minTPSLista = lista[i]
+            minTPSLista = arreglo[i]
             minTPSListaIndex = i
 
     return minTPSListaIndex
 
 
 def obtener_puesto_menor_tps_medico():
-    return obtenerPuestoMenorTpsDeLista(TPSM)
+    return obtener_puesto_menor_tps_de_arreglo(TPSM)
 
 
 def obtener_puesto_menor_tps_enfermero():
-    return obtenerPuestoMenorTpsDeLista(TPSE)
+    return obtener_puesto_menor_tps_de_arreglo(TPSE)
 
 
 def llegada():
@@ -199,8 +199,8 @@ def realizar_simulacion():
     global TPSE
 
     while True:
-        i = obtener_primer_puesto_vacio_medico()
-        j = obtener_primer_puesto_vacio_enfermero()
+        i = obtener_puesto_menor_tps_medico()
+        j = obtener_puesto_menor_tps_enfermero()
 
         if TPSM[i] <= TPSE[j]:
             # Salida medico
@@ -242,7 +242,7 @@ def realizar_simulacion():
                         ITOE[j] = T
                         TPSE[j] = HV
 
-                SSE[j] = SSM[j] + T
+                SSE[j] = SSE[j] + T
             else:
                 llegada()
 
