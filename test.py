@@ -1,29 +1,29 @@
+
 import random
 import math
 import numpy as np
 from scipy import special
 import time
 
-HV = 10000
+HV = 66666
 
-def obtener_primer_puesto_vacio(arreglo):
-    for i in range(0, len(arreglo)):
-        if arreglo[i] == HV:
-            return i
-    return -1
+def obtener_IA():
+    R = random.uniform(0.0390502529816, 1)
+    IA = -8.5 * math.log((-1) * math.log(R)) + 10
 
-def obtener_puesto_menor_tps_de_arreglo(arreglo):
-    minTPSLista = HV
-    minTPSListaIndex = 0
+    return IA
 
-    for i in range(0, len(arreglo)):
-        if arreglo[i] < minTPSLista:
-            minTPSLista = arreglo[i]
-            minTPSListaIndex = i
+def obtener_TA():
+    while True:
+        R = random.uniform(0, 1)
+        TA = 14.5 * math.sqrt(2) * math.sqrt(-math.log(1 - R)) + 5
+        return TA
+      
 
-    return minTPSListaIndex
-
-lista = [1000,1000,1000,1000]
-
-print(obtener_puesto_menor_tps_de_arreglo(lista))
-
+while True:
+    IA = obtener_IA()
+    TA = obtener_TA()
+    print(f"Se genero un IA: {IA}")
+    print(f"Se genero un TA: {TA}") 
+    print(f"RESTA: {IA-TA}")
+   

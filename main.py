@@ -18,7 +18,7 @@ while True:
         print("\nError: Solo se permiten numeros enteros.\n")
         continue
 
-HV = 10000000
+HV = 6666666666666
 iterationIndex = 0
 EVENTO = "C.I."
 
@@ -67,10 +67,12 @@ def obtener_primer_puesto_vacio(arreglo):
 
 
 def obtener_TA():
-    R = random.uniform(0, 1)
-    TA = -29 * math.log(1 - R) + 5
-    print(f"Se genero un TA: {TA}")
-    return TA
+    while True:
+        R = random.uniform(0, 1)
+        TA = 14.5 * math.sqrt(2) * math.sqrt(-math.log(1 - R)) + 5
+        print(f"Se genero un TA: {TA}")
+        return TA
+ 
 
 
 
@@ -78,7 +80,7 @@ def obtener_IA():
     R = random.uniform(0.0390502529816, 1)
     IA = -8.5 * math.log((-1) * math.log(R)) + 10
     print(f"Se genero un IA: {IA}")
-    return IA
+    return  IA  + 5
 
 
 def obtener_primer_puesto_vacio_medico():
@@ -128,7 +130,8 @@ def llegada():
     TPLL = T + IA
     R = random.uniform(0, 1)
 
-    if R <= 0.24:
+    if R <= 0.24: 
+        print("Entre al if 24")
         NSP += 1
         if NSP <= M:
             x = obtener_primer_puesto_vacio_medico()
@@ -153,6 +156,7 @@ def llegada():
                 print(f"el enfermero {x} ya atendio CP")
 
     else:
+        print("Else al if 24")
         NSE += 1
         if NSP < M and NSE <= E:
             x = obtener_primer_puesto_vacio_enfermero()
@@ -163,8 +167,9 @@ def llegada():
             TPSE[x] = T + TA
             STAE[x] = STAE[x] + TA
             print(f"el enfermero {x} ya atendio CN")
-
+    
     NT += 1
+    print("Termino la llegada / sali del if 24")
 
 
 
@@ -235,13 +240,15 @@ def realizar_simulacion():
 
                 SSM[i] = SSM[i] + T
             else:
+                print(f"TPSM {i}: {TPSM[i]} / TPSE {j} {TPSE[j]} / TPLL {TPLL} ")
                 llegada()
         else:
             if TPSE[j] < TPLL:
                 EVENTO = "Salida Enfermero"
                 T = TPSE[j]
-                print(f"El enfermero {j} tuvo una salida")
+                print(f"HAY NSE: {NSE}")
                 NSE -= 1
+                print(f"El enfermero {j} tuvo una salida, quedan en NSE: {NSE}")
 
                 if NSP > M:
                     NSE += 1
@@ -266,7 +273,9 @@ def realizar_simulacion():
         if T < TF:
             continue
         else:
+            print("Entre AL VACIAMIENTO")
             if NSP > 0 or NSE > 0:
+                print(f"NSE {NSE} / NSP {NSP}")
                 TPLL = HV
                 continue
             else:
