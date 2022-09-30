@@ -4,7 +4,7 @@ import numpy as np
 from scipy import special
 import time
 
-M = 4
+M = 2
 E = 5
 
 while True:
@@ -56,7 +56,7 @@ SSM = [0] * M
 STOE = [0] * E
 STOM = [0] * M
 
-TF = 100  # 48 semanas (en minutos)
+TF = 500000  # 48 semanas (en minutos)
 
 
 def obtener_primer_puesto_vacio(arreglo):
@@ -67,18 +67,18 @@ def obtener_primer_puesto_vacio(arreglo):
 
 
 def obtener_TA():
-    while True:
-        R = random.uniform(0, 1)
-        TA = -29 * math.log(1 - R) + 5
-        return TA
+    R = random.uniform(0, 1)
+    TA = -29 * math.log(1 - R) + 5
+    print(f"Se genero un TA: {TA}")
+    return TA
+
 
 
 def obtener_IA():
-    while True:
-        R = random.uniform(0.0390502529816, 1)
-        IA = -8.5 * math.log((-1) * math.log(R)) + 10
-        # if TA > 0.0:
-        return IA
+    R = random.uniform(0.0390502529816, 1)
+    IA = -8.5 * math.log((-1) * math.log(R)) + 10
+    print(f"Se genero un IA: {IA}")
+    return IA
 
 
 def obtener_primer_puesto_vacio_medico():
@@ -119,6 +119,9 @@ def llegada():
     global NT
     global NSP
     global NSE
+    global TPSM
+    global SLLE
+    global TPSE
 
     T = TPLL
     IA = obtener_IA()
@@ -129,14 +132,17 @@ def llegada():
         NSP += 1
         if NSP <= M:
             x = obtener_primer_puesto_vacio_medico()
+            print(f"el medico {x} va a atender CP")
             SLLM[x] = SLLM[x] + T
             STOM[x] = STOM[x] + (T - ITOM[x])
             TA = obtener_TA()
             TPSM[x] = T + TA
             STAM[x] = STAM[x] + TA
+            print(f"el medico {x} ya atendio CP")
         else:
             if NSP == (M + 1) and NSE < E:
                 x = obtener_primer_puesto_vacio_enfermero()
+                print(f"el enfermero {x} va a atender CP")
                 SLLE[x] = SLLE[x] + T
                 NSE += 1
                 NSP -= 1
@@ -144,18 +150,22 @@ def llegada():
                 TA = obtener_TA()
                 TPSE[x] = T + TA
                 STAE[x] = STAE[x] + TA
+                print(f"el enfermero {x} ya atendio CP")
 
     else:
         NSE += 1
         if NSP < M and NSE <= E:
             x = obtener_primer_puesto_vacio_enfermero()
+            print(f"el enfermero {x} va a atender CN")
             SLLE[x] = SLLE[x] + T
             STOE[x] = STOE[x] + (T - ITOE[x])
             TA = obtener_TA()
             TPSE[x] = T + TA
             STAE[x] = STAE[x] + TA
+            print(f"el enfermero {x} ya atendio CN")
 
     NT += 1
+
 
 
 def resultados():
@@ -171,14 +181,17 @@ def resultados():
         sumatoria_permamencia_medico = SSM[i] - SLLM[i]
         PECP = (SSM[i] - SLLM[i] - STAM[i]) / NT
         PTOM[i] = (STOM[i] * 100) / T
+        print(f"SSM {i} = {SSM[i]} / SLLM {i} = {SLLM[i]} / STAM {i} ={STAM[i]} / {SSM[i]-SLLM[i]-STAM[i]}")
 
     for j in range(0, E):
         sumatoria_permamencia_enfermero = SSE[j] - SLLE[j]
         PECE = (SSE[j] - SLLE[j] - STAE[j]) / NT
         PTOE[j] = (STOE[j] * 100) / T
+        print(f"SSE {j} = {SSE[j]} / SLLE {j} = {SLLE[j]} / STAE {j} ={STAE[j]} / {SSE[i]-SLLE[i]-STAE[i]}")
 
-    PPS = (sumatoria_permamencia_enfermero + sumatoria_permamencia_medico) / NT
-    print(f"Promedio de permanencia en el sistema: {PPS}")
+    #PPS = (sumatoria_permamencia_enfermero + sumatoria_permamencia_medico) / NT
+
+    #print(f"Promedio de permanencia en el sistema: {PPS}")
     print(f"Promedio de espera en cola de medicos: {PECP}")
     print(f"Promedio de espera en cola de enfermeros: {PECE}")
 
@@ -207,6 +220,7 @@ def realizar_simulacion():
             if TPSM[i] < TPLL:
                 EVENTO = "Salida Medico"
                 T = TPSM[i]
+                print(f"El medico {i} tuvo una salida")
                 NSP -= 1
 
                 if NSP >= M:
@@ -216,6 +230,7 @@ def realizar_simulacion():
                     STAM[i] = STAM[i] + TA
                 else:
                     ITOM[i] = T
+                    print(f"El medico {i} esta ocioso")
                     TPSM[i] = HV
 
                 SSM[i] = SSM[i] + T
@@ -225,6 +240,7 @@ def realizar_simulacion():
             if TPSE[j] < TPLL:
                 EVENTO = "Salida Enfermero"
                 T = TPSE[j]
+                print(f"El enfermero {j} tuvo una salida")
                 NSE -= 1
 
                 if NSP > M:
@@ -240,6 +256,7 @@ def realizar_simulacion():
                         STAE[j] = STAE[j] + TA
                     else:
                         ITOE[j] = T
+                        print(f"El enfermero {j} se esta rascando :s")
                         TPSE[j] = HV
 
                 SSE[j] = SSE[j] + T
