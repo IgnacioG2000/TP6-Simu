@@ -4,8 +4,8 @@ import numpy as np
 from scipy import special
 import time
 
-M = 2
-E = 5
+M = 0
+E = 0
 
 while True:
     try:
@@ -24,13 +24,15 @@ EVENTO = "C.I."
 
 i = -1
 j = -1
+x = -1
 
 ### C.I. ###
 T = 0
 
 NSE = 0
 NSP = 0
-NT = 0
+NTE = 0
+NTP = 0
 
 ITOE = [0] * E
 ITOM = [0] * M
@@ -56,7 +58,7 @@ SSM = [0] * M
 STOE = [0] * E
 STOM = [0] * M
 
-TF = 500000  # 48 semanas (en minutos)
+TF = 1000  # 48 semanas (en minutos)
 
 
 def obtener_primer_puesto_vacio(arreglo):
@@ -72,15 +74,13 @@ def obtener_TA():
         TA = 14.5 * math.sqrt(2) * math.sqrt(-math.log(1 - R)) + 5
         print(f"Se genero un TA: {TA}")
         return TA
- 
-
 
 
 def obtener_IA():
     R = random.uniform(0.0390502529816, 1)
     IA = -8.5 * math.log((-1) * math.log(R)) + 10
     print(f"Se genero un IA: {IA}")
-    return  IA  + 5
+    return IA
 
 
 def obtener_primer_puesto_vacio_medico():
@@ -112,41 +112,47 @@ def obtener_puesto_menor_tps_enfermero():
 
 
 def llegada():
-    global i, j
+
     global T, NSE, NSP, TPLL, SLLM, SSE, SSM, PPS, TF
     global STAM, STAE, STOE, STOM
-    global ITOM
+    global ITOM, ITOE
     global EVENTO
     global PECE, PECP
-    global NT
+    global NTP
+    global NTE
     global NSP
     global NSE
     global TPSM
     global SLLE
     global TPSE
+    global x
 
     T = TPLL
     IA = obtener_IA()
     TPLL = T + IA
     R = random.uniform(0, 1)
 
-    if R <= 0.24: 
+    if R <= 0.24:
         print("Entre al if 24")
         NSP += 1
         if NSP <= M:
             x = obtener_primer_puesto_vacio_medico()
             print(f"el medico {x} va a atender CP")
             SLLM[x] = SLLM[x] + T
+            print(SLLM[x])
             STOM[x] = STOM[x] + (T - ITOM[x])
             TA = obtener_TA()
             TPSM[x] = T + TA
             STAM[x] = STAM[x] + TA
             print(f"el medico {x} ya atendio CP")
+            NTP += 1
+
         else:
             if NSP == (M + 1) and NSE < E:
                 x = obtener_primer_puesto_vacio_enfermero()
                 print(f"el enfermero {x} va a atender CP")
                 SLLE[x] = SLLE[x] + T
+                print(SLLE[x])
                 NSE += 1
                 NSP -= 1
                 STOE[x] = STOE[x] + (T - ITOE[x])
@@ -154,49 +160,68 @@ def llegada():
                 TPSE[x] = T + TA
                 STAE[x] = STAE[x] + TA
                 print(f"el enfermero {x} ya atendio CP")
+                NTE += 1
 
     else:
         print("Else al if 24")
         NSE += 1
-        if NSP < M and NSE <= E:
+        if NSP <= M and NSE <= E:
             x = obtener_primer_puesto_vacio_enfermero()
             print(f"el enfermero {x} va a atender CN")
             SLLE[x] = SLLE[x] + T
+            print(SLLE[x])
             STOE[x] = STOE[x] + (T - ITOE[x])
             TA = obtener_TA()
             TPSE[x] = T + TA
             STAE[x] = STAE[x] + TA
             print(f"el enfermero {x} ya atendio CN")
-    
-    NT += 1
+            NTE += 1
+
     print("Termino la llegada / sali del if 24")
 
 
-
 def resultados():
-    global PPS
     global SSM
     global SLLM
-    global NT
+    global NTE, NTP
     global PTOE
     global PTOM
     global T
+    global PECP
+    global STOM
+    global STAM
+    global PECE
+    global STOE
+    global STAE
+    global SSE
 
     for i in range(0, M):
-        sumatoria_permamencia_medico = SSM[i] - SLLM[i]
-        PECP = (SSM[i] - SLLM[i] - STAM[i]) / NT
+        PECPS = SSM[i] - SLLM[i] - STAM[i]
         PTOM[i] = (STOM[i] * 100) / T
-        print(f"SSM {i} = {SSM[i]} / SLLM {i} = {SLLM[i]} / STAM {i} ={STAM[i]} / {SSM[i]-SLLM[i]-STAM[i]}")
+        ##print(
+        ##   f"SSM {i} = {SSM[i]} / SLLM {i} = {SLLM[i]} / STAM {i} ={STAM[i]} / {SSM[i]-SLLM[i]-STAM[i]}"
+        ##)
+
+    PECP = PECPS / NTP
+    print(
+        f"Sumatoria de promedio de espera en cola prioritaria es: {PECPS} y la cantidad de gente total en la cola prioritaria es: {NTP}"
+    )
 
     for j in range(0, E):
-        sumatoria_permamencia_enfermero = SSE[j] - SLLE[j]
-        PECE = (SSE[j] - SLLE[j] - STAE[j]) / NT
+        PECES = SSE[j] - SLLE[j] - STAE[j]
         PTOE[j] = (STOE[j] * 100) / T
-        print(f"SSE {j} = {SSE[j]} / SLLE {j} = {SLLE[j]} / STAE {j} ={STAE[j]} / {SSE[i]-SLLE[i]-STAE[i]}")
+        ##print(
+        ##    f"SSE {j} = {SSE[j]} / SLLE {j} = {SLLE[j]} / STAE {j} ={STAE[j]} / {SSE[i]-SLLE[i]-STAE[i]}"
+        ##)
 
-    #PPS = (sumatoria_permamencia_enfermero + sumatoria_permamencia_medico) / NT
+    PECE = PECES / NTE
 
-    #print(f"Promedio de permanencia en el sistema: {PPS}")
+    print(
+        f"Sumatoria de promedio de espera en cola estandar es: {PECES} y la cantidad de gente total en la cola estandar es: {NTE}"
+    )
+    # PPS = (sumatoria_permamencia_enfermero + sumatoria_permamencia_medico) / NT
+
+    # print(f"Promedio de permanencia en el sistema: {PPS}")
     print(f"Promedio de espera en cola de medicos: {PECP}")
     print(f"Promedio de espera en cola de enfermeros: {PECE}")
 
@@ -215,6 +240,7 @@ def realizar_simulacion():
     global PECE, PECP
     global TPSM
     global TPSE
+    global ITOE, ITOM
 
     while True:
         i = obtener_puesto_menor_tps_medico()
@@ -257,7 +283,7 @@ def realizar_simulacion():
                     TPSE[j] = T + TA
                     STAE[j] = STAE[j] + TA
                 else:
-                    if NSE >= E:
+                    if NSE >= E and NSP <= M:
                         TA = obtener_TA()
                         TPSE[j] = T + TA
                         STAE[j] = STAE[j] + TA
