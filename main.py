@@ -55,7 +55,7 @@ SPSM = 0
 SPSE = 0
 
 STTA = 0
-SPC = 0
+
 
 STAE = [0] * E
 STAM = [0] * M
@@ -132,7 +132,7 @@ def llegada():
     global TPSE
     global SPSE
     global SPSM
-    global x, STTA, SPC
+    global x, STTA
 
     SPSE = SPSE + (TPLL - T) * NSE
     SPSM = SPSM + (TPLL - T) * NSP
@@ -156,7 +156,6 @@ def llegada():
                 x = obtener_primer_puesto_vacio_enfermero()
                 NSE += 1
                 NSP -= 1
-                SPC += 1
                 STOE[x] = STOE[x] + (T - ITOE[x])
                 TA = obtener_TA()
                 STTA += TA
@@ -204,7 +203,7 @@ def resultados():
 
     print(f"Promedio de espera en cola de medicos: {PECP}")
     print(f"Promedio de espera en cola de enfermeros: {PECE}")
-    print(f"Porcentaje de pasaje de cola prioritaria a estandar: {SPC/(NTP)*100}")
+    
 
     for i in range(0, M):
         print(f"porcentaje de tiempo ocioso del medico {i} es: {PTOM[i]}")
