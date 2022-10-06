@@ -235,6 +235,7 @@ def realizar_simulacion():
             if TPSM[i] < TPLL:
                 EVENTO = "Salida Medico"
                 SPSM = SPSM + (TPSM[i] - T) * NSP
+                SPSE = SPSE + (TPSM[i] - T) * NSE
                 T = TPSM[i]
                 NSP -= 1
 
@@ -254,6 +255,7 @@ def realizar_simulacion():
             if TPSE[j] < TPLL:
                 EVENTO = "Salida Enfermero"
                 SPSE = SPSE + (TPSE[j] - T) * NSE
+                SPSM = SPSM + (TPSE[j] - T) * NSP
                 T = TPSE[j]
                 NSE -= 1
 
