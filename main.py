@@ -1,7 +1,6 @@
 import random
 import math
 import numpy as np
-from scipy import special
 import time
 
 M = 0
@@ -78,14 +77,14 @@ def obtener_primer_puesto_vacio(arreglo):
 def obtener_TA():
     while True:
         R = random.uniform(0, 1)
-        TA = 14.5 * math.sqrt(2) * math.sqrt(-math.log(1 - R)) 
-        return  TA 
+        TA = 14.5 * math.sqrt(2) * math.sqrt(-math.log(1 - R))
+        return TA
 
 
 def obtener_IA():
-    R = random.uniform(0.0390502529816, 1)
+    R = random.uniform(0, 1)
     IA = -8.5 * math.log((-1) * math.log(R)) + 5
-    return  IA 
+    return IA 
 
 
 def obtener_primer_puesto_vacio_medico():
